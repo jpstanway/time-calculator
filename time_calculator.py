@@ -1,45 +1,54 @@
 import math
 
 
-def getHours(time):
+def splitTime(time):
     split = time.split(":")
-    return int(split[0])
+    hours = int(split[0])
+    mins = int(split[1])
+
+    return {
+        'hours': hours,
+        'mins': mins,
+    }
 
 
-def convertToDecimal(time):
-    conv = time.replace(":", ".")
-    return float(conv)
+def calcTime(start, time, type):
+    calc = 0
+    intervals = {
+        'hours': 12,
+        'mins': 60
+    }
+    interval = intervals[type]
+
+    if (time >= interval):
+        rotations = math.floor(time / interval)
+        leftOver = time % 12
+        isEven = (leftOver % 2) == 0
+
+        calc = start + leftOver
+    else:
+        calc = start + time
+
+    if (calc > interval):
+        calc -= interval
+
+    return str(calc)
 
 
 def add_time(start, duration):
     new_time = ""
-    new_hours = 0
 
     # separate AM/PM
     strTime = start.split(" ")
-    durTime = duration.split(" ")
+    # durTime = duration.split(" ")
 
     # convert time to minutes
-    strDec = convertToDecimal(strTime[0])
-    durDec = convertToDecimal(durTime[0])
+    strSplit = splitTime(strTime[0])
+    durSplit = splitTime(duration)
 
-    strHours = getHours(strTime[0])
-    durHours = getHours(durTime[0])
+    newHours = calcTime(strSplit['hours'], durSplit['hours'], 'hours')
+    newMins = calcTime(strSplit['mins'], durSplit['mins'], 'mins')
 
-    if (durHours >= 12):
-        rotations = math.floor(durHours / 12)
-        leftOver = durHours % 12
-        isEven = (leftOver % 2) == 0
-
-        # if (isEven == False):
-
-        new_hours = strHours + leftOver
-    else:
-        new_hours = strHours + durHours
-
-    if (new_hours > 12):
-        new_hours -= 12
-
-    new_time += str(new_hours)
+    new_time += newHours + ":" + newMins + strTime[1]
 
     return new_time
