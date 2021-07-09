@@ -12,6 +12,16 @@ def splitTime(time):
     }
 
 
+def calcPeriod(hours, period):
+    rotations = math.floor(hours / 12)
+    isEven = (rotations % 2) == 0
+
+    if (isEven == False):
+        return "PM" if period == "AM" else "AM"
+    else:
+        return period
+
+
 def calcTime(start, time, type):
     calc = 0
     intervals = {
@@ -21,18 +31,20 @@ def calcTime(start, time, type):
     interval = intervals[type]
 
     if (time >= interval):
-        rotations = math.floor(time / interval)
-        leftOver = time % 12
-        isEven = (leftOver % 2) == 0
-
-        calc = start + leftOver
+        leftOver = time % interval
+        calc = abs(interval - leftOver - start)
     else:
         calc = start + time
 
     if (calc > interval):
         calc -= interval
 
-    return str(calc)
+    calc = str(calc)
+
+    if (type == 'mins' and len(calc) == 1):
+        calc = "0" + calc
+
+    return calc
 
 
 def add_time(start, duration):
@@ -40,7 +52,6 @@ def add_time(start, duration):
 
     # separate AM/PM
     strTime = start.split(" ")
-    # durTime = duration.split(" ")
 
     # convert time to minutes
     strSplit = splitTime(strTime[0])
@@ -48,7 +59,8 @@ def add_time(start, duration):
 
     newHours = calcTime(strSplit['hours'], durSplit['hours'], 'hours')
     newMins = calcTime(strSplit['mins'], durSplit['mins'], 'mins')
+    newPeriod = calcPeriod(strSplit['hours'], strTime[1])
 
-    new_time += newHours + ":" + newMins + strTime[1]
+    new_time += newHours + ":" + newMins + " " + newPeriod
 
     return new_time
