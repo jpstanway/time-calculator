@@ -32,7 +32,7 @@ def calcTime(start, time, type):
 
     if (time >= interval):
         leftOver = time % interval
-        calc = abs(interval - leftOver - start)
+        calc = start + leftOver
     else:
         calc = start + time
 
@@ -47,7 +47,16 @@ def calcTime(start, time, type):
     return calc
 
 
-def add_time(start, duration):
+def calcDays(start, hours, period):
+    added = start + hours
+
+    if (period == 'PM'):
+        added += 12
+
+    return math.floor(added / 24)
+
+
+def add_time(start, duration, weekday=''):
     new_time = ""
 
     # separate AM/PM
@@ -59,8 +68,21 @@ def add_time(start, duration):
 
     newHours = calcTime(strSplit['hours'], durSplit['hours'], 'hours')
     newMins = calcTime(strSplit['mins'], durSplit['mins'], 'mins')
-    newPeriod = calcPeriod(strSplit['hours'], strTime[1])
+    newPeriod = calcPeriod(durSplit['hours'], strTime[1])
+    days = calcDays(strSplit['hours'], durSplit['hours'], strTime[1])
+
+    if (strSplit['mins'] + durSplit['mins'] >= 60):
+        newHours = str(int(newHours) + 1)
+        newPeriod = "PM" if newPeriod == "AM" else "AM"
 
     new_time += newHours + ":" + newMins + " " + newPeriod
+
+    if (weekday):
+        new_time += ', ' + weekday
+
+    if (days == 1):
+        new_time += ' (next day)'
+    elif (days > 1):
+        new_time += ' (' + str(days) + ' days later)'
 
     return new_time
