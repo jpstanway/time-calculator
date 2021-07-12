@@ -1,19 +1,35 @@
 import math
 
 
-def splitTime(time):
-    split = time.split(":")
-    hours = int(split[0])
-    mins = int(split[1])
+def totalTime(start, duration, period):
+    total = 0
+    strSplit = start.split(":")
+    durSplit = duration.split(":")
 
-    return {
-        'hours': hours,
-        'mins': mins,
-    }
+    # add hours in current day to duration
+    currentHours = int(strSplit[0])
+
+    if (period == 'PM' and currentHours != 12):
+        currentHours += 12
+    elif (period == 'AM' and currentHours == 12):
+        currentHours = 0
+
+    hours = int(durSplit[0]) + currentHours
+
+    # add up mins, and add to hours if needed
+    mins = int(strSplit[1]) + int(durSplit[1])
+
+    if (mins >= 60):
+        hours += 1
+        mins -= 60
+
+    total = str(hours) + ":" + str(mins)
+
+    return total
 
 
 def calcPeriod(hours, period):
-    rotations = math.floor(hours / 12)
+    rotations = math.floor(int(hours) / 12)
     isEven = (rotations % 2) == 0
 
     if (isEven == False):
@@ -22,67 +38,39 @@ def calcPeriod(hours, period):
         return period
 
 
-def calcTime(start, time, type):
-    calc = 0
-    intervals = {
-        'hours': 12,
-        'mins': 60
-    }
-    interval = intervals[type]
+def calcHour(hours):
+    leftOver = int(hours) % 12
 
-    if (time >= interval):
-        leftOver = time % interval
-        calc = start + leftOver
-    else:
-        calc = start + time
+    if (leftOver == 0):
+        leftOver = 12
 
-    if (calc > interval):
-        calc -= interval
-
-    calc = str(calc)
-
-    if (type == 'mins' and len(calc) == 1):
-        calc = "0" + calc
-
-    return calc
-
-
-def calcDays(start, hours, period):
-    added = start + hours
-
-    if (period == 'PM'):
-        added += 12
-
-    return math.floor(added / 24)
+    return str(leftOver)
 
 
 def add_time(start, duration, weekday=''):
     new_time = ""
 
-    # separate AM/PM
     strTime = start.split(" ")
 
-    # convert time to minutes
-    strSplit = splitTime(strTime[0])
-    durSplit = splitTime(duration)
+    total = totalTime(strTime[0], duration, strTime[1])
+    totalSplit = total.split(":")
 
-    newHours = calcTime(strSplit['hours'], durSplit['hours'], 'hours')
-    newMins = calcTime(strSplit['mins'], durSplit['mins'], 'mins')
-    newPeriod = calcPeriod(durSplit['hours'], strTime[1])
-    days = calcDays(strSplit['hours'], durSplit['hours'], strTime[1])
+    days = math.floor(int(totalSplit[0]) / 24)
+    hour = calcHour(totalSplit[0])
+    mins = totalSplit[1]
+    period = calcPeriod(totalSplit[0], strTime[1])
 
-    if (strSplit['mins'] + durSplit['mins'] >= 60):
-        newHours = str(int(newHours) + 1)
-        newPeriod = "PM" if newPeriod == "AM" else "AM"
+    if (len(mins) == 1):
+        mins = "0" + mins
 
-    new_time += newHours + ":" + newMins + " " + newPeriod
+    new_time = hour + ":" + mins + " " + period
 
     if (weekday):
-        new_time += ', ' + weekday
+        new_time += ", " + weekday
 
     if (days == 1):
-        new_time += ' (next day)'
+        new_time += " (next day)"
     elif (days > 1):
-        new_time += ' (' + str(days) + ' days later)'
+        new_time += " (" + str(days) + " days later)"
 
     return new_time
