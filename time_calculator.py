@@ -29,7 +29,7 @@ def totalTime(start, duration, period):
 
 
 def calcPeriod(hours, period):
-    rotations = math.floor(int(hours) / 12)
+    rotations = round(int(hours) / 12)
     isEven = (rotations % 2) == 0
 
     if (isEven == False):
@@ -51,6 +51,7 @@ def add_time(start, duration, weekday=''):
     new_time = ""
 
     strTime = start.split(" ")
+    strSplit = strTime[0].split(':')
 
     total = totalTime(strTime[0], duration, strTime[1])
     totalSplit = total.split(":")
@@ -58,7 +59,7 @@ def add_time(start, duration, weekday=''):
     days = math.floor(int(totalSplit[0]) / 24)
     hour = calcHour(totalSplit[0])
     mins = totalSplit[1]
-    period = calcPeriod(totalSplit[0], strTime[1])
+    period = calcPeriod(strSplit[0], strTime[1])
 
     if (len(mins) == 1):
         mins = "0" + mins
