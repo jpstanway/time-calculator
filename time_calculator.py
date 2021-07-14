@@ -47,6 +47,36 @@ def calcHour(hours):
     return str(leftOver)
 
 
+def calcWeekday(day, days):
+    weekdays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+    ]
+
+    # get index of current day
+    idx = weekdays.index(day.lower())
+
+    # count up number of days
+    n = days
+    i = idx
+    count = 0
+
+    while count < n:
+        if i == 6:
+            i = 0
+        else:
+            i += 1
+
+        count += 1
+
+    return weekdays[i].capitalize()
+
+
 def add_time(start, duration, weekday=''):
     new_time = ""
 
@@ -67,7 +97,7 @@ def add_time(start, duration, weekday=''):
     new_time = hour + ":" + mins + " " + period
 
     if (weekday):
-        new_time += ", " + weekday
+        new_time += ", " + calcWeekday(weekday, days)
 
     if (days == 1):
         new_time += " (next day)"
